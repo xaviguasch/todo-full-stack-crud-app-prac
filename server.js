@@ -1,7 +1,7 @@
 // Declare variables
 const express = require('express')
 const app = express()
-const PORT = 8500
+const PORT = 8000
 const mongoose = require('mongoose')
 
 // Set middleware
@@ -18,13 +18,28 @@ mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true }, () => {
   console.log('Connected to db!')
 })
 // GET METHOD
-app.get('/', async (req, res) => {
+app.get('/', (req, res) => {
   try {
     TodoTask.find({}, (err, tasks) => {
       res.render('index.ejs', { todoTasks: tasks })
     })
   } catch (err) {
     if (err) return res.status(500).send(err)
+  }
+})
+// POST METHOD
+app.post('/', async (req, res) => {
+  const todoTask = new TodoTask({
+    title: req.body.title,
+    content: req.body.content,
+  })
+
+  try {
+    await todoTask.save()
+    res.redirect('/')
+  } catch (err) {
+    if (err) return res.status(500).send(err)
+    res.redirect('/')
   }
 })
 
