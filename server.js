@@ -27,6 +27,7 @@ app.get('/', (req, res) => {
     if (err) return res.status(500).send(err)
   }
 })
+
 // POST METHOD
 app.post('/', async (req, res) => {
   const todoTask = new TodoTask({
@@ -42,6 +43,32 @@ app.post('/', async (req, res) => {
     res.redirect('/')
   }
 })
+
+// EDIT or UPDATE METHOD
+app
+  .route('/edit/:id')
+  .get((req, res) => {
+    const { id } = req.params
+
+    TodoTask.find({}, (err, tasks) => {
+      res.render('edit.ejs', { todoTasks: tasks, idTask: id })
+    })
+  })
+  .post((req, res) => {
+    const { id } = req.params
+
+    TodoTask.findByIdAndUpdate(
+      id,
+      {
+        title: req.body.title,
+        content: req.body.content,
+      },
+      (err) => {
+        if (err) return res.status(500).send(err)
+        res.redirect('/')
+      }
+    )
+  })
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}!`)
